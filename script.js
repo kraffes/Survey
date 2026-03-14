@@ -104,7 +104,7 @@ form.addEventListener('submit', async (e) => {
     document.getElementById('submit-btn').textContent = "Envoi...";
     
     // Remplace par ton email réel
-    await fetch("https://formsubmit.co/ajax/TON_EMAIL@MAIL.COM", {
+    await fetch("https://formsubmit.co/ajax/bsorez@gmail.com", {
         method: "POST",
         body: new FormData(form)
     });
