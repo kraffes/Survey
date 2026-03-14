@@ -2,7 +2,7 @@ let currentStep = 0;
 const container = document.getElementById('survey-container');
 const form = document.getElementById('survey-form');
 
-// --- LOGIQUE CONDITIONNELLE (Le Cœur) ---
+// --- LOGIQUE CONDITIONNELLE ---
 function shouldShow(idx) {
     const q = surveyConfig[idx];
     if (!q || !q.condition) return true;
@@ -10,16 +10,15 @@ function shouldShow(idx) {
     const data = new FormData(form);
     const actualValue = data.get(q.condition.dependsOn);
     
-    // On normalise en tableau pour gérer le choix unique ou multiple
     const targetValues = Array.isArray(q.condition.value) ? q.condition.value : [q.condition.value];
     const isIncluded = targetValues.includes(actualValue);
 
-    // Application de l'opérateur (Égal ou Différent)
     return q.condition.operator === '!=' ? !isIncluded : isIncluded;
 }
 
-// --- GÉNÉRATION DYNAMIQUE ---
+// --- GÉNÉRATION DYNAMIQUE DU FORMULAIRE ---
 function initForm() {
+    container.innerHTML = ""; // On vide au cas où
     surveyConfig.forEach((item, index) => {
         const step = document.createElement('div');
         step.className = `question-step ${index === 0 ? 'active' : ''}`;
@@ -27,11 +26,21 @@ function initForm() {
         let html = `<label><strong>${index + 1}. ${item.question}</strong>${item.required ? ' <span style="color:red">*</span>':''}</label>`;
 
         switch(item.type) {
+            case "matrix":
+                html += `<div class="matrix-scroll"><table class="matrix-table"><thead><tr><th></th>${item.columns.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+                item.rows.forEach((r, ri) => {
+                    html += `<tr><td class="row-label">${r}</td>${item.columns.map(c => `<td><input type="radio" name="${item.id}_${ri}" value="${c}" ${item.required?'required':''}></td>`).join('')}</tr>`;
+                });
+                html += `</tbody></table></div>`;
+                break;
             case "select":
                 html += `<select name="${item.id}" ${item.required?'required':''}><option value="">Choisir...</option>${item.options.map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
                 break;
             case "radio":
                 html += `<div class="options-group">` + item.options.map(o => `<div><input type="radio" name="${item.id}" value="${o}" ${item.required?'required':''}> ${o}</div>`).join('') + `</div>`;
+                break;
+            case "file":
+                html += `<input type="file" name="${item.id}" ${item.required?'required':''}>`;
                 break;
             default:
                 html += `<input type="${item.type}" name="${item.id}" ${item.required?'required':''}>`;
@@ -48,6 +57,28 @@ function initForm() {
     container.appendChild(summary);
 }
 
+// --- AFFICHAGE DU RÉSUMÉ ---
+function renderSummary() {
+    const data = new FormData(form);
+    let html = "";
+    surveyConfig.forEach((q, i) => {
+        if (shouldShow(i)) {
+            if (q.type === "matrix") {
+                html += `<p><strong>${q.question} :</strong><br>`;
+                q.rows.forEach((r, ri) => {
+                    const val = data.get(`${q.id}_${ri}`) || "<em>Non renseigné</em>";
+                    html += `<small style="margin-left:15px;">- ${r} : ${val}</small><br>`;
+                });
+                html += `</p>`;
+            } else {
+                let val = data.get(q.id) || "<em>Non renseigné</em>";
+                html += `<p><strong>${q.question} :</strong> ${val}</p>`;
+            }
+        }
+    });
+    document.getElementById('summary-content').innerHTML = html;
+}
+
 // --- NAVIGATION ---
 function updateUI() {
     const steps = document.querySelectorAll('.question-step');
@@ -60,18 +91,6 @@ function updateUI() {
 
     if (isLast) renderSummary();
     document.getElementById('progress-bar').style.width = ((currentStep + 1) / steps.length * 100) + "%";
-}
-
-function renderSummary() {
-    const data = new FormData(form);
-    let html = "";
-    surveyConfig.forEach((q, i) => {
-        if (shouldShow(i)) {
-            let val = data.get(q.id) || "<em>Non renseigné</em>";
-            html += `<p style="border-bottom:1px solid #eee; padding-bottom:5px;"><strong>${q.question} :</strong> ${val}</p>`;
-        }
-    });
-    document.getElementById('summary-content').innerHTML = html;
 }
 
 document.getElementById('next-btn').addEventListener('click', () => {
@@ -87,45 +106,37 @@ document.getElementById('next-btn').addEventListener('click', () => {
     }
 });
 
-// --- GESTION DE L'ENVOI FINAL ---
-form.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Empêche le rechargement de la page
-    
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.textContent = "Envoi en cours...";
-
-    try {
-        const response = await fetch("https://formsubmit.co/ajax/TON_EMAIL@MAIL.COM", {
-            method: "POST",
-            body: new FormData(form)
-        });
-
-        if (response.ok) {
-            // Cacher le formulaire et afficher le message de succès
-            form.style.display = 'none';
-            document.getElementById('thank-you-message').style.display = 'block';
-            
-            // Nettoyer la barre de progression et le stockage local
-            document.getElementById('progress-bar').style.width = "100%";
-            localStorage.clear();
-        } else {
-            throw new Error("Erreur serveur");
-        }
-    } catch (error) {
-        console.error("Erreur :", error);
-        alert("Désolé, une erreur est survenue lors de l'envoi. Veuillez réessayer.");
-        btn.disabled = false;
-        btn.textContent = "Envoyer l'enquête";
-    }
-});
-
 document.getElementById('prev-btn').addEventListener('click', () => {
     currentStep--;
     while (currentStep > 0 && !shouldShow(currentStep)) currentStep--;
     updateUI();
 });
 
-// --- LANCEMENT ---
+// --- ENVOI FINAL ---
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = "Envoi en cours...";
+
+    try {
+        // REMPLACE BIEN PAR TON EMAIL REEL ICI
+        const response = await fetch("https://formsubmit.co/ajax/TON_EMAIL@MAIL.COM", {
+            method: "POST",
+            body: new FormData(form)
+        });
+
+        if (response.ok) {
+            form.style.display = 'none';
+            document.getElementById('thank-you-message').style.display = 'block';
+            localStorage.clear();
+        } else { throw new Error(); }
+    } catch (e) {
+        alert("Erreur lors de l'envoi.");
+        btn.disabled = false;
+        btn.textContent = "Envoyer l'enquête";
+    }
+});
+
 initForm();
 updateUI();
