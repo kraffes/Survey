@@ -42,6 +42,52 @@ input, select, textarea { width: 100%; padding: 12px; margin-top: 10px; border: 
     .navigation-buttons { flex-direction: column-reverse; }
     button { width: 100%; }
 }
+/* --- Styles pour la Grille de Satisfaction (Matrix) --- */
+
+.matrix-scroll {
+    overflow-x: auto; /* Permet de glisser sur mobile si le tableau est trop large */
+    margin-top: 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+}
+
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 450px; /* Force la structure en tableau même sur petit écran */
+}
+
+.matrix-table th, .matrix-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.matrix-table th {
+    background-color: var(--bg-body);
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+.row-label {
+    text-align: left !important;
+    font-weight: bold;
+    min-width: 150px;
+    background-color: var(--bg-card);
+}
+
+/* Effet de survol pour aider à la lecture sur de larges lignes */
+.matrix-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* En mode sombre, on ajuste le survol */
+@media (prefers-color-scheme: dark) {
+    .matrix-table tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+}
 
 /* --- ADMIN SPECIFIC --- */
 .admin-box {
