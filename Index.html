@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquête d'Opinion Dynamique</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+
+        <h1>Sondage d'opinion</h1>
+        <p id="form-desc">Merci de répondre à ces quelques questions.</p>
+
+        <form id="survey-form">
+            <div id="survey-container">
+                </div>
+
+            <div class="navigation-buttons">
+                <div>
+                    <button type="button" id="prev-btn" style="display:none;">Précédent</button>
+                    <button type="button" id="reset-btn" class="btn-secondary">Recommencer</button>
+                </div>
+                <div>
+                    <button type="button" id="next-btn">Suivant</button>
+                    <button type="submit" id="submit-btn" style="display:none;">Envoyer</button>
+                </div>
+            </div>
+        </form>
+
+        <div id="thank-you-message" style="display:none;">
+            <h2>Merci beaucoup !</h2>
+            <p>Vos réponses ont été transmises avec succès.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
