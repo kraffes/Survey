@@ -16,7 +16,7 @@ const surveyConfig = [
     },
     { 
         id: "note", 
-        question: "Note sur 10", 
+        question: "Rcommandez vous nos services? Note sur 10", 
         type: "range", 
         min: 1, 
         max: 10, 
