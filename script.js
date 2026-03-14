@@ -87,6 +87,39 @@ document.getElementById('next-btn').addEventListener('click', () => {
     }
 });
 
+// --- GESTION DE L'ENVOI FINAL ---
+form.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Empêche le rechargement de la page
+    
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = "Envoi en cours...";
+
+    try {
+        const response = await fetch("https://formsubmit.co/ajax/TON_EMAIL@MAIL.COM", {
+            method: "POST",
+            body: new FormData(form)
+        });
+
+        if (response.ok) {
+            // Cacher le formulaire et afficher le message de succès
+            form.style.display = 'none';
+            document.getElementById('thank-you-message').style.display = 'block';
+            
+            // Nettoyer la barre de progression et le stockage local
+            document.getElementById('progress-bar').style.width = "100%";
+            localStorage.clear();
+        } else {
+            throw new Error("Erreur serveur");
+        }
+    } catch (error) {
+        console.error("Erreur :", error);
+        alert("Désolé, une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+        btn.disabled = false;
+        btn.textContent = "Envoyer l'enquête";
+    }
+});
+
 document.getElementById('prev-btn').addEventListener('click', () => {
     currentStep--;
     while (currentStep > 0 && !shouldShow(currentStep)) currentStep--;
