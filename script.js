@@ -78,7 +78,7 @@ document.getElementById('survey-form').addEventListener('submit', (e) => {
     const btn = document.getElementById('submit-btn');
     btn.textContent = "Envoi...";
     
-    fetch("https://formsubmit.co/ajax/TON_EMAIL@MAIL.COM", {
+    fetch("https://formsubmit.co/ajax/bsorez@MAIL.COM", {
         method: "POST",
         body: new FormData(e.target)
     }).then(() => {
