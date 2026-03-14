@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Éditeur d'Enquête</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="max-width: 900px;">
+        <h1>🛠️ Éditeur d'Enquête</h1>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <div class="admin-box">
+                    <h3>1. Nouvelle Question</h3>
+                    <input type="text" id="new-id" placeholder="ID unique (ex: age_user)">
+                    <input type="text" id="new-question" placeholder="Texte de la question">
+                    
+                    <select id="new-type">
+                        <option value="text">Texte court</option>
+                        <option value="email">Email</option>
+                        <option value="select">Menu déroulant (Select)</option>
+                        <option value="radio">Choix unique (Radio)</option>
+                        <option value="range">Échelle (Range)</option>
+                        <option value="file">Upload de fichier</option>
+                    </select>
+
+                    <label><input type="checkbox" id="new-req"> Obligatoire</label>
+
+                    <div id="options-section" style="display:none; margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
+                        <label>Options :</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="option-input" placeholder="Ex: Très satisfait">
+                            <button type="button" onclick="addOptionToTempList()" style="width:auto;">+</button>
+                        </div>
+                        <div id="temp-options-list" class="badge-container"></div>
+                    </div>
+
+                    <div id="logic-section" class="logic-box">
+                        <label>🧠 Logique d'affichage :</label>
+                        <select id="logic-parent" onchange="updateLogicValues()">
+                            <option value="">-- Toujours afficher --</option>
+                        </select>
+                        <div id="logic-value-container" style="display:none; margin-top:5px;">
+                            <small>Si la réponse est égale à :</small>
+                            <select id="logic-value"></select>
+                        </div>
+                    </div>
+
+                    <button onclick="addQuestion()" style="margin-top:20px; width:100%;">Ajouter à l'enquête</button>
+                </div>
+            </div>
+
+            <div>
+                <div class="admin-box" style="border-left: 4px solid var(--accent);">
+                    <h3>👁️ Aperçu en direct</h3>
+                    <div id="live-preview-container" class="preview-zone"></div>
+                </div>
+
+                <div class="admin-box">
+                    <h3>📋 Liste & Code</h3>
+                    <div id="questions-list" style="margin-bottom:15px;"></div>
+                    <pre id="output-code"></pre>
+                    <button onclick="copyCode()" class="btn-secondary" style="width:100%;">Copier config.js</button>
+                </div>
+            </div>
+        </div>
+        
+        <p style="text-align:center;"><a href="index.html">⬅️ Retour au sondage</a></p>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
