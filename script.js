@@ -115,24 +115,35 @@ document.getElementById('prev-btn').addEventListener('click', () => {
 // --- ENVOI FINAL ---
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log("Tentative d'envoi détectée..."); // LOG 1
+
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
     btn.textContent = "Envoi en cours...";
 
+    const formData = new FormData(form);
+    console.log("Données prêtes :", Object.fromEntries(formData)); // LOG 2
+
     try {
-        // REMPLACE BIEN PAR TON EMAIL REEL ICI
         const response = await fetch("https://formsubmit.co/ajax/TON_EMAIL@MAIL.COM", {
             method: "POST",
-            body: new FormData(form)
+            body: formData
         });
 
+        console.log("Réponse reçue du serveur :", response.status); // LOG 3
+
         if (response.ok) {
+            console.log("Envoi réussi !");
             form.style.display = 'none';
             document.getElementById('thank-you-message').style.display = 'block';
             localStorage.clear();
-        } else { throw new Error(); }
-    } catch (e) {
-        alert("Erreur lors de l'envoi.");
+        } else {
+            const errorText = await response.text();
+            throw new Error("Erreur serveur : " + errorText);
+        }
+    } catch (error) {
+        console.error("ERREUR DÉTECTÉE :", error); // LOG D'ERREUR
+        alert("L'envoi a échoué. Détail : " + error.message);
         btn.disabled = false;
         btn.textContent = "Envoyer l'enquête";
     }
